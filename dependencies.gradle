@@ -1,0 +1,27 @@
+ext {
+    appCompatVersion = '1.1.0'
+    lifecycleVersion = "2.1.0"
+    cameraxVersion = "1.0.0-alpha05"
+    ktxVersion = "1.1.0"
+    koinViewModelVersion = "2.0.1"
+    rxJavaVersion = "2.2.12"
+    rxAndroidVersion = "2.1.1"
+    rxKotlinVersion = "2.4.0"
+
+
+    libs = [
+            appCompat           : "androidx.appcompat:appcompat:${appCompatVersion}",
+            kotlin              : "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version",
+            ktx                 : "androidx.core:core-ktx:${ktxVersion}",
+            koinViewModel       : "org.koin:koin-android-viewmodel:${koinViewModelVersion}",
+            ktxViewModel        : "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion",
+            ktxReactiveStreams  : "androidx.lifecycle:lifecycle-reactivestreams-ktx:$lifecycleVersion",
+            rxJava2             : "io.reactivex.rxjava2:rxjava:${rxJavaVersion}",
+            rxKotlin2           : "io.reactivex.rxjava2:rxkotlin:${rxKotlinVersion}",
+            rxAndroid2          : "io.reactivex.rxjava2:rxandroid:${rxAndroidVersion}",
+            cameraXCore         : "androidx.camera:camera-core:$cameraxVersion",
+            camera2             : "androidx.camera:camera-camera2:$cameraxVersion",
+            playServicesLocation: "com.google.android.gms:play-services-location:17.0.0",
+            playServicesMaps    : "com.google.android.gms:play-services-maps:17.0.0",
+    ]
+}
