@@ -27,4 +27,18 @@ class MainActivity : AppCompatActivity() {
         override fun getPermissionActivity(): Activity = activity
     }
 
+    override fun onPause() {
+        super.onPause()
+        if (arView.isArViewStarted){
+            arView.onPause()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (arView.isArViewStarted){
+            arView.onResume()
+        }
+    }
+
 }

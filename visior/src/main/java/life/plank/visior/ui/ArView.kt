@@ -25,6 +25,8 @@ class ArView @JvmOverloads constructor(
     }
 
     private var dependencyProvider: DependencyProvider? = null
+    var isArViewStarted: Boolean = false
+
 
     // Setting up Koin
     private var myLocalKoinInstance = koinApplication {}
@@ -65,6 +67,7 @@ class ArView @JvmOverloads constructor(
                     it.granted -> {
                         getCurrentLocation()
                         startCamera()
+                        isArViewStarted = true
                     }
                     else -> {
                     }
@@ -83,6 +86,14 @@ class ArView @JvmOverloads constructor(
             txtLatitudeText.text = it.lat.toString()
             txtLongitudeText.text = it.lon.toString()
         })
+    }
+
+    fun onPause() {
+        arCameraView.onPause()
+    }
+
+    fun onResume() {
+        arCameraView.onStart()
     }
 
 }

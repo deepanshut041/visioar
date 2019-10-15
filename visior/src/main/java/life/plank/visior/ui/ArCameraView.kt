@@ -162,4 +162,5 @@ class ArCameraView @JvmOverloads constructor(
         stopBackgroundThread()
     }
 
+
 }
