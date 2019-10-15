@@ -1,16 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="match_parent">
+
+    <life.plank.visior.ui.ArCameraView
+        android:id="@+id/arCameraView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+
+        />
 
     <TextView
         android:id="@+id/txtAzimuthLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Azimuth: "
         android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
+        android:text="Azimuth: "
+        android:textColor="#fff"
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
@@ -22,6 +30,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
+        android:textColor="#fff"
         android:textSize="16sp"
         app:layout_constraintStart_toEndOf="@+id/txtAzimuthLabel"
         app:layout_constraintTop_toTopOf="parent" />
@@ -30,9 +39,10 @@
         android:id="@+id/txtPitchLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Pitch: "
         android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
+        android:text="Pitch: "
+        android:textColor="#fff"
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
@@ -43,6 +53,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
+        android:textColor="#fff"
         android:textSize="16sp"
         app:layout_constraintStart_toEndOf="@+id/txtPitchLabel"
         app:layout_constraintTop_toTopOf="@+id/txtPitchLabel" />
@@ -51,9 +62,10 @@
         android:id="@+id/txtRollLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Roll: "
         android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
+        android:text="Roll: "
+        android:textColor="#fff"
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
@@ -64,6 +76,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
+        android:textColor="#fff"
         android:textSize="16sp"
         app:layout_constraintStart_toEndOf="@+id/txtRollLabel"
         app:layout_constraintTop_toTopOf="@+id/txtRollLabel" />
@@ -72,9 +85,10 @@
         android:id="@+id/txtLatitudeLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Latitude: "
         android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
+        android:text="Latitude: "
+        android:textColor="#fff"
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
@@ -85,6 +99,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
+        android:textColor="#fff"
         android:textSize="16sp"
         app:layout_constraintStart_toEndOf="@+id/txtLatitudeLabel"
         app:layout_constraintTop_toTopOf="@+id/txtLatitudeLabel" />
@@ -93,9 +108,10 @@
         android:id="@+id/txtLongitudeLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Longitudes: "
         android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
+        android:text="Longitudes: "
+        android:textColor="#fff"
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
@@ -106,7 +122,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
+        android:textColor="#fff"
         android:textSize="16sp"
         app:layout_constraintStart_toEndOf="@+id/txtLongitudeLabel"
         app:layout_constraintTop_toTopOf="@+id/txtLongitudeLabel" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

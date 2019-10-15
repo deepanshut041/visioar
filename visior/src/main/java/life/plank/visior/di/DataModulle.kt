@@ -1,6 +1,7 @@
 package life.plank.visior.di
 
 import android.hardware.SensorManager
+import android.hardware.camera2.CameraManager
 import androidx.core.content.getSystemService
 import com.patloew.rxlocation.RxLocation
 import life.plank.visior.data.location.LocationRepository
@@ -18,6 +19,17 @@ val sensorModule = module {
 
     single {
         provideSensorManager(get())
+    }
+}
+
+val cameraModule = module {
+
+    fun provideCameraManager(dependencyProvider: DependencyProvider): CameraManager {
+        return requireNotNull(dependencyProvider.getContext().getSystemService())
+    }
+
+    single {
+        provideCameraManager(get())
     }
 }
 

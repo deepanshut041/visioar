@@ -1,9 +1,9 @@
 package life.plank.visior.ui
 
 import android.content.Context
+import android.hardware.camera2.CameraManager
 import android.util.AttributeSet
 import android.view.View
-import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.Observer
@@ -15,7 +15,7 @@ import org.koin.core.KoinComponent
 import org.koin.core.inject
 import org.koin.dsl.koinApplication
 import org.koin.dsl.module
-
+import android.hardware.camera2.CameraDevice
 class ArView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : ConstraintLayout(context, attrs, defStyleAttr), LifecycleObserver, KoinComponent {
@@ -26,11 +26,13 @@ class ArView @JvmOverloads constructor(
 
     private var dependencyProvider: DependencyProvider? = null
 
+    // Setting up Koin
     private var myLocalKoinInstance = koinApplication {}
-
     override fun getKoin(): Koin = myLocalKoinInstance.koin
 
     private val viewModel: ArViewViewModel by inject()
+
+    private val cameraManager: CameraManager by inject()
 
     fun onCreate(dependencyProvider: DependencyProvider) {
 
@@ -43,7 +45,8 @@ class ArView @JvmOverloads constructor(
                 rxLocationModule,
                 orientationModule,
                 viewModelModule,
-                locationModule
+                locationModule,
+                cameraModule
             )
         )
         bindToViewModel()
@@ -58,15 +61,21 @@ class ArView @JvmOverloads constructor(
             })
 
             getPermissions()?.subscribe {
-                val context = dependencyProvider!!.getContext()
                 when {
                     it.granted -> {
                         getCurrentLocation()
+                        startCamera()
                     }
-                    else -> Toast.makeText(context, "Please allow permission to use Ar", Toast.LENGTH_SHORT).show()
+                    else -> {
+                    }
                 }
             }
         }
+    }
+
+    private fun startCamera() {
+        arCameraView.setCameraManager(cameraManager)
+        arCameraView.onStart()
     }
 
     private fun getCurrentLocation() {

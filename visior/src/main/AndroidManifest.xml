@@ -1,2 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="life.plank.visior" />
+    package="life.plank.visior" >
+
+    <uses-permission android:name="android.permission.CAMERA" />
+</manifest>
