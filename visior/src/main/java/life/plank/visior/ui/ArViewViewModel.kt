@@ -1,27 +1,16 @@
 package life.plank.visior.ui
 
+import android.annotation.SuppressLint
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.toLiveData
+import life.plank.visior.data.orientation.OrientationData
 import life.plank.visior.data.orientation.RotationRepository
-import life.plank.visior.util.PermissionManager
-import life.plank.visior.util.PermissionResult
-import life.plank.visior.util.SingleLiveEvent
 
 class ArViewViewModel(
-    private val rotationRepository: RotationRepository,
-    private val permissionManager: PermissionManager){
+    private val rotationRepository: RotationRepository){
 
-    val permissionState: LiveData<PermissionResult>
-        get() = _permissionState
-
-    private val _permissionState = SingleLiveEvent<PermissionResult>()
-
-    fun checkPermissions(){
-        if (permissionManager.areAllPermissionsGranted())
-            _permissionState.value = PermissionResult.GRANTED
-        else permissionManager.requestAllPermissions()
-    }
-
-    fun getOrientationData(){
-        rotationRepository.getOrientationData()
+    @SuppressLint("CheckResult")
+    fun getOrientationData(): LiveData<OrientationData> {
+        return rotationRepository.getOrientationUpdate().toLiveData()
     }
 }

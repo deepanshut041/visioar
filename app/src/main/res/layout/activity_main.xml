@@ -6,93 +6,9 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/txtAzimuthLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Azimuth: "
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="20dp"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/txtAzimuthText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="20dp"
-        android:textSize="16sp"
-        app:layout_constraintStart_toEndOf="@+id/txtAzimuthLabel"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/txtPitchLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Pitch: "
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="20dp"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtAzimuthLabel" />
-
-    <TextView
-        android:id="@+id/txtPitchText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:textSize="16sp"
-        app:layout_constraintStart_toEndOf="@+id/txtPitchLabel"
-        app:layout_constraintTop_toTopOf="@+id/txtPitchLabel" />
-
-    <TextView
-        android:id="@+id/txtRollLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Roll: "
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="20dp"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtPitchLabel" />
-
-    <TextView
-        android:id="@+id/txtRollText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:textSize="16sp"
-        app:layout_constraintStart_toEndOf="@+id/txtRollLabel"
-        app:layout_constraintTop_toTopOf="@+id/txtRollLabel" />
-
-    <TextView
-        android:id="@+id/txtSensorsLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Sensors: "
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="20dp"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtRollLabel" />
-
-    <TextView
-        android:id="@+id/txtSensorsText"
+    <life.plank.visior.ui.ArView
+        android:id="@+id/arView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="20dp"
-        android:textSize="16sp"
-        app:layout_constraintTop_toBottomOf="@+id/txtSensorsLabel" />
-
-
-
-
+        android:layout_height="match_parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

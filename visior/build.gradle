@@ -24,6 +24,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 
 }
 
@@ -42,6 +46,9 @@ dependencies {
     // Life Cycle
     implementation libs.koin
     implementation libs.ktxReactiveStreams
+
+    // Timber
+    implementation 'com.jakewharton.timber:timber:4.7.1'
 
     //RxJava
     implementation libs.rxJava2

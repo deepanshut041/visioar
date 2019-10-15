@@ -22,6 +22,10 @@ val permissionModule = module {
     fun providePermissionManager(dependencyProvider: DependencyProvider): PermissionManager {
         return PermissionManager(dependencyProvider.getPermissionActivity())
     }
+
+    single {
+        providePermissionManager(get())
+    }
 }
 
 val orientationModule = module {
