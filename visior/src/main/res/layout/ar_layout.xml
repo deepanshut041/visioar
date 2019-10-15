@@ -68,4 +68,25 @@
         app:layout_constraintStart_toEndOf="@+id/txtRollLabel"
         app:layout_constraintTop_toTopOf="@+id/txtRollLabel" />
 
+
+    <TextView
+        android:id="@+id/txtPermissionLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Permissions: "
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txtRollLabel" />
+
+    <TextView
+        android:id="@+id/txtPermissionText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:textSize="16sp"
+        app:layout_constraintStart_toEndOf="@+id/txtPermissionLabel"
+        app:layout_constraintTop_toTopOf="@+id/txtPermissionLabel" />
 </androidx.constraintlayout.widget.ConstraintLayout>

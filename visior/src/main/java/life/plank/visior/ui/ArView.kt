@@ -3,6 +3,7 @@ package life.plank.visior.ui
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
+import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.Observer
@@ -14,7 +15,6 @@ import org.koin.core.KoinComponent
 import org.koin.core.inject
 import org.koin.dsl.koinApplication
 import org.koin.dsl.module
-import timber.log.Timber
 
 class ArView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
@@ -48,11 +48,22 @@ class ArView @JvmOverloads constructor(
     }
 
     private fun bindToViewModel() {
-        viewModel.getOrientationData().observe(dependencyProvider!!.getLifecycleOwner(), Observer {
-            txtAzimuthText.text = it.aizmuth.toString()
-            txtPitchText.text = it.pitch.toString()
-            txtRollText.text = it.roll.toString()
-        })
+
+        with(viewModel){
+            getOrientationData().observe(dependencyProvider!!.getLifecycleOwner(), Observer {
+                txtAzimuthText.text = it.aizmuth.toString()
+                txtPitchText.text = it.pitch.toString()
+                txtRollText.text = it.roll.toString()
+            })
+
+            getPermissions()?.subscribe{
+                when {
+                    it.granted -> Toast.makeText(dependencyProvider!!.getContext(), "All Permissions are granted", Toast.LENGTH_SHORT).show()
+                    it.shouldShowRequestPermissionRationale -> Toast.makeText(dependencyProvider!!.getContext(), "One permission is not allowed please allow it", Toast.LENGTH_SHORT).show()
+                    else -> Toast.makeText(dependencyProvider!!.getContext(), "One permission is not allowed please allow it from Settings", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
     }
 
 }

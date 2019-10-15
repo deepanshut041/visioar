@@ -50,6 +50,9 @@ dependencies {
     // Timber
     implementation 'com.jakewharton.timber:timber:4.7.1'
 
+    // Rx Permission
+    implementation 'com.github.tbruyelle:rxpermissions:0.10.2'
+
     //RxJava
     implementation libs.rxJava2
     implementation(libs.rxKotlin2) {
