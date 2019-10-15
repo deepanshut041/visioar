@@ -37,9 +37,10 @@ dependencies {
 
     // Support
     implementation libs.appCompat
+    implementation libs.constraintLayout
 
     // Life Cycle
-    implementation libs.ktxViewModel
+    implementation libs.koin
     implementation libs.ktxReactiveStreams
 
     //RxJava
