@@ -53,6 +53,11 @@ dependencies {
     // Rx Permission
     implementation 'com.github.tbruyelle:rxpermissions:0.10.2'
 
+    // Rx Location
+    implementation 'com.patloew.rxlocation:rxlocation:1.0.5'
+    implementation libs.playServicesLocation
+    implementation libs.playServicesMaps
+
     //RxJava
     implementation libs.rxJava2
     implementation(libs.rxKotlin2) {

@@ -40,30 +40,40 @@ class ArView @JvmOverloads constructor(
                 module { single { dependencyProvider } },
                 sensorModule,
                 permissionModule,
+                rxLocationModule,
                 orientationModule,
-                viewModelModule
+                viewModelModule,
+                locationModule
             )
         )
         bindToViewModel()
     }
 
     private fun bindToViewModel() {
-
-        with(viewModel){
+        with(viewModel) {
             getOrientationData().observe(dependencyProvider!!.getLifecycleOwner(), Observer {
                 txtAzimuthText.text = it.aizmuth.toString()
                 txtPitchText.text = it.pitch.toString()
                 txtRollText.text = it.roll.toString()
             })
 
-            getPermissions()?.subscribe{
+            getPermissions()?.subscribe {
+                val context = dependencyProvider!!.getContext()
                 when {
-                    it.granted -> Toast.makeText(dependencyProvider!!.getContext(), "All Permissions are granted", Toast.LENGTH_SHORT).show()
-                    it.shouldShowRequestPermissionRationale -> Toast.makeText(dependencyProvider!!.getContext(), "One permission is not allowed please allow it", Toast.LENGTH_SHORT).show()
-                    else -> Toast.makeText(dependencyProvider!!.getContext(), "One permission is not allowed please allow it from Settings", Toast.LENGTH_SHORT).show()
+                    it.granted -> {
+                        getCurrentLocation()
+                    }
+                    else -> Toast.makeText(context, "Please allow permission to use Ar", Toast.LENGTH_SHORT).show()
                 }
             }
         }
+    }
+
+    private fun getCurrentLocation() {
+        viewModel.getLocation().observe(dependencyProvider!!.getLifecycleOwner(), Observer {
+            txtLatitudeText.text = it.lat.toString()
+            txtLongitudeText.text = it.lon.toString()
+        })
     }
 
 }

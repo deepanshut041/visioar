@@ -68,12 +68,11 @@
         app:layout_constraintStart_toEndOf="@+id/txtRollLabel"
         app:layout_constraintTop_toTopOf="@+id/txtRollLabel" />
 
-
     <TextView
-        android:id="@+id/txtPermissionLabel"
+        android:id="@+id/txtLatitudeLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Permissions: "
+        android:text="Latitude: "
         android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
         android:textSize="16sp"
@@ -82,11 +81,32 @@
         app:layout_constraintTop_toBottomOf="@+id/txtRollLabel" />
 
     <TextView
-        android:id="@+id/txtPermissionText"
+        android:id="@+id/txtLatitudeText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:textSize="16sp"
-        app:layout_constraintStart_toEndOf="@+id/txtPermissionLabel"
-        app:layout_constraintTop_toTopOf="@+id/txtPermissionLabel" />
+        app:layout_constraintStart_toEndOf="@+id/txtLatitudeLabel"
+        app:layout_constraintTop_toTopOf="@+id/txtLatitudeLabel" />
+
+    <TextView
+        android:id="@+id/txtLongitudeLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Longitudes: "
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txtLatitudeLabel" />
+
+    <TextView
+        android:id="@+id/txtLongitudeText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:textSize="16sp"
+        app:layout_constraintStart_toEndOf="@+id/txtLongitudeLabel"
+        app:layout_constraintTop_toTopOf="@+id/txtLongitudeLabel" />
 </androidx.constraintlayout.widget.ConstraintLayout>
