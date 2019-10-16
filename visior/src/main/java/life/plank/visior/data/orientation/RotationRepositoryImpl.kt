@@ -4,17 +4,26 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.view.Surface.*
+import android.view.WindowManager
 import io.reactivex.*
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
 
-class RotationRepositoryImpl(private val sensorManager: SensorManager) : RotationRepository {
+class RotationRepositoryImpl(private val sensorManager: SensorManager, private val windowManager: WindowManager) : RotationRepository {
+
+    private var alpha = 0f
+    private var lastCos = 0f
+    private var lastSin = 0f
 
     private val orientationPublisher: Observable<SensorEvent> = Observable.create {
         val sensorEventListener = SensorListener(it)
         sensorManager.registerListener(
             sensorEventListener,
-            sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR),
+            sensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR),
             SensorManager.SENSOR_DELAY_UI
         )
         it.setCancellable {
@@ -35,22 +44,61 @@ class RotationRepositoryImpl(private val sensorManager: SensorManager) : Rotatio
         val orientation = FloatArray(3)
 
         SensorManager.getRotationMatrixFromVector(rotMatrix, sensorEvent.values)
-        val newRotMatrix = FloatArray(9)
-        SensorManager.remapCoordinateSystem(
-            rotMatrix,
-            SensorManager.AXIS_X,
-            SensorManager.AXIS_Y,
-            newRotMatrix
-        )
+        val newRotMatrix = getAdjustedRotationMatrix(rotMatrix)
 
         SensorManager.getOrientation(newRotMatrix, orientation)
-        val azimuth = Math.toDegrees(orientation[0].toDouble()).toFloat()
+        val azimuth = lowPassDegreesFilter(orientation[0])
         val pitch = Math.toDegrees(orientation[1].toDouble()).toFloat()
         val roll = Math.toDegrees(orientation[2].toDouble()).toFloat()
 
         return OrientationData(azimuth, pitch, roll)
     }
 
+    private fun lowPassDegreesFilter(azimuthRadians: Float): Float {
+        lastSin = alpha * lastSin + (1 - alpha) * sin(azimuthRadians)
+        lastCos = alpha * lastCos + (1 - alpha) * cos(azimuthRadians)
+
+        return ((Math.toDegrees(atan2(lastSin, lastCos).toDouble()) + 360) % 360).toFloat()
+    }
+
+    private fun getAdjustedRotationMatrix(rotationMatrix: FloatArray): FloatArray {
+        val axisXY = getProperAxis()
+
+        val adjustedRotationMatrix = FloatArray(9)
+        SensorManager.remapCoordinateSystem(
+            rotationMatrix, axisXY.first,
+            axisXY.second, adjustedRotationMatrix
+        )
+        return adjustedRotationMatrix
+    }
+
+    private fun getProperAxis(): Pair<Int, Int> {
+        val worldAxisX: Int
+        val worldAxisY: Int
+        when (windowManager.defaultDisplay?.rotation) {
+            ROTATION_90 -> {
+                worldAxisX = SensorManager.AXIS_Z
+                worldAxisY = SensorManager.AXIS_MINUS_X
+            }
+            ROTATION_180 -> {
+                worldAxisX = SensorManager.AXIS_MINUS_X
+                worldAxisY = SensorManager.AXIS_MINUS_Z
+            }
+            ROTATION_270 -> {
+                worldAxisX = SensorManager.AXIS_MINUS_Z
+                worldAxisY = SensorManager.AXIS_X
+            }
+            ROTATION_0 -> {
+                worldAxisX = SensorManager.AXIS_X
+                worldAxisY = SensorManager.AXIS_Z
+            }
+            else -> {
+                worldAxisX = SensorManager.AXIS_X
+                worldAxisY = SensorManager.AXIS_Z
+            }
+        }
+        return Pair(worldAxisX, worldAxisY)
+    }
 
     class SensorListener(private val emitter: ObservableEmitter<SensorEvent>) :
         SensorEventListener {
@@ -68,11 +116,10 @@ class RotationRepositoryImpl(private val sensorManager: SensorManager) : Rotatio
 
         override fun onSensorChanged(event: SensorEvent?) {
             event?.let {
-                if (it.sensor.type == Sensor.TYPE_ROTATION_VECTOR)
+                if (it.sensor.type == Sensor.TYPE_GAME_ROTATION_VECTOR)
                     emitter.onNext(it)
             }
         }
     }
-
 
 }

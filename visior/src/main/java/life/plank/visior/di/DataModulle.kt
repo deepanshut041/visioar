@@ -2,6 +2,7 @@ package life.plank.visior.di
 
 import android.hardware.SensorManager
 import android.hardware.camera2.CameraManager
+import android.view.WindowManager
 import androidx.core.content.getSystemService
 import com.patloew.rxlocation.RxLocation
 import life.plank.visior.data.location.LocationRepository
@@ -17,10 +18,20 @@ val sensorModule = module {
         return requireNotNull(dependencyProvider.getContext().getSystemService())
     }
 
+    fun provideWindowManager(dependencyProvider: DependencyProvider): WindowManager {
+        return requireNotNull(dependencyProvider.getContext().getSystemService())
+    }
+
     single {
         provideSensorManager(get())
     }
+
+    single {
+        provideWindowManager(get())
+    }
 }
+
+
 
 val cameraModule = module {
 
@@ -53,7 +64,7 @@ val rxLocationModule = module {
 
 val orientationModule = module {
     factory<RotationRepository>{
-        RotationRepositoryImpl(get())
+        RotationRepositoryImpl(get(), get())
     }
 }
 
