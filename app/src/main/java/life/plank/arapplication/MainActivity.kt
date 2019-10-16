@@ -21,8 +21,9 @@ class MainActivity : AppCompatActivity() {
     private fun setArPoints(){
         arView.setArPoints(
             listOf(
-                ArPointData(40, 34.3332207, -122.084, "Point 40"),
-                ArPointData(100, 34.3332234, -122.084, "Point 100")
+                ArPointData(15.5511347, 73.7822677, "Point 1"),
+                ArPointData(15.5511307, 73.7822607,  "Point 2"),
+                ArPointData(15.5511387, 73.7822657,  "Point 3")
             )
         )
     }

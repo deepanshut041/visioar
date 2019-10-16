@@ -89,6 +89,7 @@ class ArView @JvmOverloads constructor(
                 txtPitchText.text = screenData.pitch.toString()
                 txtLongitudeText.text = screenData.lon.toString()
                 txtLatitudeText.text = screenData.lat.toString()
+                Log.i("Selected", screenData.points.toString())
             })
             isArViewStarted = true
         }
@@ -110,5 +111,10 @@ class ArView @JvmOverloads constructor(
     fun onResume() {
         arCameraView.onStart()
     }
+
+    companion object {
+        private const val MAXIMUM_ANGLE = 360
+    }
+
 
 }
