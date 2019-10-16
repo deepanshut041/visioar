@@ -81,19 +81,17 @@ class ArView @JvmOverloads constructor(
 
     @SuppressLint("LogNotTimber")
     private fun setSensorDataListeners() {
-        viewModel.getLocation().observe(dependencyProvider!!.getLifecycleOwner(), Observer {
-            txtLatitudeText.text = it.lat.toString()
-            txtLongitudeText.text = it.lon.toString()
-        })
-
-        viewModel.getOrientationData().observe(dependencyProvider!!.getLifecycleOwner(), Observer {
-            txtAzimuthText.text = it.aizmuth.toString()
-            txtPitchText.text = it.pitch.toString()
-            txtRollText.text = it.roll.toString()
-        })
-
-        startCamera()
-        isArViewStarted = true
+        dependencyProvider?.let {
+            startCamera()
+            viewModel.getLivePoints().observe(it.getLifecycleOwner(), Observer { screenData ->
+                txtAzimuthText.text = screenData.azimuth.toString()
+                txtRollText.text = screenData.roll.toString()
+                txtPitchText.text = screenData.pitch.toString()
+                txtLongitudeText.text = screenData.lon.toString()
+                txtLatitudeText.text = screenData.lat.toString()
+            })
+            isArViewStarted = true
+        }
     }
 
     fun setArPoints(points: List<ArPointData>){

@@ -14,7 +14,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        arView.onCreate(dependencyProvider = DependencyProviderImpl(applicationContext, this, this))
+        arView.onCreate(DependencyProviderImpl(applicationContext, this, this))
         setArPoints()
     }
 
