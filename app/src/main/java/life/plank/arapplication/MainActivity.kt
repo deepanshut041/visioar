@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.lifecycle.LifecycleOwner
 import kotlinx.android.synthetic.main.activity_main.*
+import life.plank.visior.data.view.ArPointData
 import life.plank.visior.di.DependencyProvider
 
 class MainActivity : AppCompatActivity() {
@@ -14,7 +15,16 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         arView.onCreate(dependencyProvider = DependencyProviderImpl(applicationContext, this, this))
+        setArPoints()
+    }
 
+    private fun setArPoints(){
+        arView.setArPoints(
+            listOf(
+                ArPointData(40, 34.3332207, -122.084, "Point 40"),
+                ArPointData(100, 34.3332234, -122.084, "Point 100")
+            )
+        )
     }
 
     class DependencyProviderImpl(

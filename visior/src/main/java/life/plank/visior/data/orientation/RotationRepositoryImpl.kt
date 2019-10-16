@@ -8,14 +8,14 @@ import io.reactivex.*
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 
-class RotationRepositoryImpl(private val sensorManager: SensorManager): RotationRepository {
+class RotationRepositoryImpl(private val sensorManager: SensorManager) : RotationRepository {
 
     private val orientationPublisher: Observable<SensorEvent> = Observable.create {
         val sensorEventListener = SensorListener(it)
         sensorManager.registerListener(
             sensorEventListener,
             sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR),
-            SensorManager.SENSOR_DELAY_NORMAL
+            SensorManager.SENSOR_DELAY_UI
         )
         it.setCancellable {
             sensorManager.unregisterListener(sensorEventListener)
@@ -36,7 +36,12 @@ class RotationRepositoryImpl(private val sensorManager: SensorManager): Rotation
 
         SensorManager.getRotationMatrixFromVector(rotMatrix, sensorEvent.values)
         val newRotMatrix = FloatArray(9)
-        SensorManager.remapCoordinateSystem(rotMatrix, SensorManager.AXIS_X, SensorManager.AXIS_Y, newRotMatrix)
+        SensorManager.remapCoordinateSystem(
+            rotMatrix,
+            SensorManager.AXIS_X,
+            SensorManager.AXIS_Y,
+            newRotMatrix
+        )
 
         SensorManager.getOrientation(newRotMatrix, orientation)
         val azimuth = Math.toDegrees(orientation[0].toDouble()).toFloat()
@@ -47,7 +52,8 @@ class RotationRepositoryImpl(private val sensorManager: SensorManager): Rotation
     }
 
 
-    class SensorListener(private val emitter: ObservableEmitter<SensorEvent>) : SensorEventListener{
+    class SensorListener(private val emitter: ObservableEmitter<SensorEvent>) :
+        SensorEventListener {
         override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
             when (sensor?.type) {
                 Sensor.TYPE_ROTATION_VECTOR -> when (accuracy) {
@@ -61,7 +67,10 @@ class RotationRepositoryImpl(private val sensorManager: SensorManager): Rotation
         }
 
         override fun onSensorChanged(event: SensorEvent?) {
-            if (event != null) emitter.onNext(event)
+            event?.let {
+                if (it.sensor.type == Sensor.TYPE_ROTATION_VECTOR)
+                    emitter.onNext(it)
+            }
         }
     }
 

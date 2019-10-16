@@ -1,5 +1,6 @@
 package life.plank.visior.ui
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.hardware.camera2.CameraManager
 import android.util.AttributeSet
@@ -16,6 +17,10 @@ import org.koin.core.inject
 import org.koin.dsl.koinApplication
 import org.koin.dsl.module
 import android.hardware.camera2.CameraDevice
+import android.util.Log
+import android.widget.Toast
+import life.plank.visior.data.view.ArPointData
+
 class ArView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : ConstraintLayout(context, attrs, defStyleAttr), LifecycleObserver, KoinComponent {
@@ -30,6 +35,7 @@ class ArView @JvmOverloads constructor(
 
     // Setting up Koin
     private var myLocalKoinInstance = koinApplication {}
+
     override fun getKoin(): Koin = myLocalKoinInstance.koin
 
     private val viewModel: ArViewViewModel by inject()
@@ -56,21 +62,13 @@ class ArView @JvmOverloads constructor(
 
     private fun bindToViewModel() {
         with(viewModel) {
-            getOrientationData().observe(dependencyProvider!!.getLifecycleOwner(), Observer {
-                txtAzimuthText.text = it.aizmuth.toString()
-                txtPitchText.text = it.pitch.toString()
-                txtRollText.text = it.roll.toString()
-            })
-
             getPermissions()?.subscribe {
                 when {
-                    it.granted -> {
-                        getCurrentLocation()
-                        startCamera()
-                        isArViewStarted = true
-                    }
-                    else -> {
-                    }
+                    it.granted -> setSensorDataListeners()
+                    else -> Toast.makeText(
+                        dependencyProvider!!.getContext(),
+                        "Please Allow Permissions",
+                        Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -81,11 +79,30 @@ class ArView @JvmOverloads constructor(
         arCameraView.onStart()
     }
 
-    private fun getCurrentLocation() {
+    @SuppressLint("LogNotTimber")
+    private fun setSensorDataListeners() {
         viewModel.getLocation().observe(dependencyProvider!!.getLifecycleOwner(), Observer {
             txtLatitudeText.text = it.lat.toString()
             txtLongitudeText.text = it.lon.toString()
         })
+
+        viewModel.getOrientationData().observe(dependencyProvider!!.getLifecycleOwner(), Observer {
+            txtAzimuthText.text = it.aizmuth.toString()
+            txtPitchText.text = it.pitch.toString()
+            txtRollText.text = it.roll.toString()
+        })
+
+        startCamera()
+        isArViewStarted = true
+    }
+
+    fun setArPoints(points: List<ArPointData>){
+        viewModel.setPoints(points)
+    }
+
+
+    fun setNearestDistance(distance: Int){
+        viewModel.setDistance(distance)
     }
 
     fun onPause() {
