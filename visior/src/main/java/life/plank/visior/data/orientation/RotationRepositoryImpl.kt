@@ -4,6 +4,7 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.util.Log
 import android.view.Surface.*
 import android.view.WindowManager
 import io.reactivex.*
@@ -105,9 +106,9 @@ class RotationRepositoryImpl(private val sensorManager: SensorManager, private v
         override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
             when (sensor?.type) {
                 Sensor.TYPE_ROTATION_VECTOR -> when (accuracy) {
-                    SensorManager.SENSOR_STATUS_ACCURACY_LOW -> Timber.tag("Rotation Sensor").d("ACCURACY low")
-                    SensorManager.SENSOR_STATUS_ACCURACY_MEDIUM -> Timber.tag("Rotation Sensor").d("ACCURACY medium")
-                    SensorManager.SENSOR_STATUS_ACCURACY_HIGH -> Timber.tag("Rotation Sensor").d("ACCURACY high")
+                    SensorManager.SENSOR_STATUS_ACCURACY_LOW -> Log.i("Rotation Sensor", "ACCURACY low")
+                    SensorManager.SENSOR_STATUS_ACCURACY_MEDIUM -> Log.i("Rotation Sensor","ACCURACY medium")
+                    SensorManager.SENSOR_STATUS_ACCURACY_HIGH -> Log.i("Rotation Sensor", "ACCURACY high")
                     else -> Unit
                 }
                 else -> Unit

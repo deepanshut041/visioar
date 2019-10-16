@@ -20,6 +20,7 @@ import android.hardware.camera2.CameraDevice
 import android.util.Log
 import android.widget.Toast
 import life.plank.visior.data.view.ArPointData
+import timber.log.Timber
 
 class ArView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
@@ -43,7 +44,7 @@ class ArView @JvmOverloads constructor(
     private val cameraManager: CameraManager by inject()
 
     fun onCreate(dependencyProvider: DependencyProvider) {
-
+        Timber.plant(Timber.DebugTree())
         this.dependencyProvider = dependencyProvider
         myLocalKoinInstance.modules(
             listOf(

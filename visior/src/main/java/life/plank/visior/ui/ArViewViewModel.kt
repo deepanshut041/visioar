@@ -13,15 +13,13 @@ import life.plank.visior.data.view.ArPointData
 import life.plank.visior.data.view.ArSelectedPoint
 import life.plank.visior.data.view.ScreenData
 import life.plank.visior.util.PermissionManager
-import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.sin
+import kotlin.math.*
 
 class ArViewViewModel(
     private val rotationRepository: RotationRepository,
     private val permissionManager: PermissionManager,
     private val locationRepository: LocationRepository
-    ){
+) {
 
     private var points: List<ArPointData> = emptyList()
 
@@ -34,11 +32,11 @@ class ArViewViewModel(
     }
 
 
-    fun setPoints(points: List<ArPointData>){
+    fun setPoints(points: List<ArPointData>) {
         this.points = points
     }
 
-    fun setDistance(distance:Int){
+    fun setDistance(distance: Int) {
         this.distance = distance
     }
 
@@ -48,12 +46,24 @@ class ArViewViewModel(
             .combineLatest(rotationRepository.getOrientationUpdate())
             .map { (lc, oc) ->
                 val selectedPoints = ArrayList<ArSelectedPoint>()
-                for (point in points){
-                    handleDestination(lc, LocationData(point.lat, point.lon), oc.aizmuth, point.label)?.let {
+                for (point in points) {
+                    handleDestination(
+                        lc,
+                        LocationData(point.lat, point.lon),
+                        oc.aizmuth,
+                        point.label
+                    )?.let {
                         selectedPoints.add(it)
                     }
                 }
-                ScreenData(oc.aizmuth.toInt(), oc.pitch.toInt(), oc.roll.toInt(), lc.lat, lc.lon, selectedPoints)
+                ScreenData(
+                    oc.aizmuth.toInt(),
+                    oc.pitch.toInt(),
+                    oc.roll.toInt(),
+                    lc.lat,
+                    lc.lon,
+                    selectedPoints
+                )
 
             }.toLiveData()
     }
@@ -64,17 +74,18 @@ class ArViewViewModel(
         currentAzimuth: Float,
         label: String
     ): ArSelectedPoint? {
-        val headingAngle = calculateHeadingAngle(currentLocation, destinationLocation)
-
-        val currentDestinationAzimuth =
-            (headingAngle - currentAzimuth + 360) % 360
+        val currentDestinationAzimuth = calculateTheoreticalAzimuth(currentLocation, destinationLocation)
 
         val distanceToDestination = locationRepository.getDistanceBetweenPoints(
             currentLocation,
             destinationLocation
         )
 
-        if (distanceToDestination > 100 && (!isPointOnCamera(currentAzimuth.toDouble(), currentDestinationAzimuth.toDouble())))
+        if (distanceToDestination > 10 && (!isPointOnCamera(
+                currentAzimuth.toDouble(),
+                currentDestinationAzimuth
+            ))
+        )
             return null
 
         return ArSelectedPoint(
@@ -84,7 +95,7 @@ class ArViewViewModel(
         )
     }
 
-    private fun isPointOnCamera(currentAzimuth: Double, pointAzimuth: Double): Boolean{
+    private fun isPointOnCamera(currentAzimuth: Double, pointAzimuth: Double): Boolean {
         var minAngle = currentAzimuth - 40
         var maxAngle = currentAzimuth + 40
 
@@ -108,17 +119,27 @@ class ArViewViewModel(
         return false
     }
 
-    private fun calculateHeadingAngle(currentLocation: LocationData, destinationLocation: LocationData): Float {
-        val currentLatitudeRadians = Math.toRadians(currentLocation.lat)
-        val destinationLatitudeRadians = Math.toRadians(destinationLocation.lat)
-        val deltaLongitude = Math.toRadians(destinationLocation.lon - currentLocation.lon)
+    private fun calculateTheoreticalAzimuth(cL: LocationData, dL: LocationData): Double {
+        val dX = dL.lat - cL.lat
+        val dY = dL.lon - cL.lon
 
-        val y = cos(currentLatitudeRadians) * sin(destinationLatitudeRadians) -
-                sin(currentLatitudeRadians) * cos(destinationLatitudeRadians) * cos(deltaLongitude)
-        val x = sin(deltaLongitude) * cos(destinationLatitudeRadians)
-        val headingAngle = Math.toDegrees(atan2(x, y)).toFloat()
+        var phiAngle: Double
+        val tanPhi: Double
 
-        return (headingAngle + 360) % 360
+        tanPhi = abs(dY / dX)
+        phiAngle = atan(tanPhi)
+        phiAngle = Math.toDegrees(phiAngle)
+
+        if (dX > 0 && dY > 0) { // I quater
+            return phiAngle
+        } else if (dX < 0 && dY > 0) { // II
+            return 180 - phiAngle
+        } else if (dX < 0 && dY < 0) { // III
+            return 180 + phiAngle
+        } else if (dX > 0 && dY < 0) { // IV
+            return 360 - phiAngle
+        }
+        return phiAngle
     }
 
 }
