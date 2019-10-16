@@ -127,4 +127,27 @@
         app:layout_constraintStart_toEndOf="@+id/txtLongitudeLabel"
         app:layout_constraintTop_toTopOf="@+id/txtLongitudeLabel" />
 
+    <TextView
+        android:id="@+id/txtPointsLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:text="Points: "
+        android:textColor="#fff"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txtLongitudeLabel" />
+
+    <TextView
+        android:id="@+id/txtPointsText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:textColor="#fff"
+        android:textSize="16sp"
+        app:layout_constraintStart_toEndOf="@+id/txtPointsLabel"
+        app:layout_constraintTop_toTopOf="@+id/txtPointsLabel" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

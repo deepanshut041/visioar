@@ -74,22 +74,21 @@ class ArViewViewModel(
         currentAzimuth: Float,
         label: String
     ): ArSelectedPoint? {
-        val currentDestinationAzimuth = calculateTheoreticalAzimuth(currentLocation, destinationLocation)
+        val headingAngle = calculateTheoreticalAzimuth(currentLocation, destinationLocation)
 
         val distanceToDestination = locationRepository.getDistanceBetweenPoints(
             currentLocation,
             destinationLocation
         )
 
-        if (distanceToDestination > 10 && (!isPointOnCamera(
-                currentAzimuth.toDouble(),
-                currentDestinationAzimuth
-            ))
-        )
+        if (distanceToDestination > 10)
+            return null
+
+        if  (!isPointOnCamera(currentAzimuth.toDouble(), headingAngle))
             return null
 
         return ArSelectedPoint(
-            currentDestinationAzimuth.toInt(),
+            headingAngle.toInt(),
             distanceToDestination,
             label
         )

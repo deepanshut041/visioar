@@ -21,9 +21,14 @@ class MainActivity : AppCompatActivity() {
     private fun setArPoints(){
         arView.setArPoints(
             listOf(
-                ArPointData(15.5511347, 73.7822677, "Point 1"),
-                ArPointData(15.5511307, 73.7822607,  "Point 2"),
-                ArPointData(15.5511387, 73.7822657,  "Point 3")
+                ArPointData(15.551178, 73.782250, "Pokemon 1"),
+                ArPointData(15.551182, 73.782200,  "Pokemon 2"),
+                ArPointData(15.551185, 73.782155,  "Pokemon 3"),
+                ArPointData(15.551138, 73.782132, "Pokemon 4"),
+                ArPointData(15.551078, 73.782139,  "Pokemon 5"),
+                ArPointData(15.551050, 73.782171,  "Pokemon 6"),
+                ArPointData(15.551054, 73.782228, "Pokemon 7"),
+                ArPointData(15.551099, 73.782258,  "Pokemon 8")
             )
         )
     }
