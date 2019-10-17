@@ -77,6 +77,7 @@ class ArView @JvmOverloads constructor(
 
     private fun startCamera() {
         arCameraView.setCameraManager(cameraManager)
+        arCameraView.setSceneForm(dependencyProvider!!.getPermissionActivity())
         arCameraView.onStart()
     }
 
