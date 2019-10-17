@@ -3,17 +3,15 @@ package life.plank.visior.ui
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
-import android.graphics.SurfaceTexture
 import android.hardware.camera2.*
 import android.net.Uri
 import android.os.Handler
 import android.os.HandlerThread
 import android.util.AttributeSet
-import android.view.Surface
-import android.view.TextureView
 import android.view.View
-import android.widget.FrameLayout
+import android.widget.SeekBar
 import androidx.appcompat.app.AlertDialog
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.Scene
 import com.google.ar.sceneform.math.Quaternion
@@ -26,7 +24,7 @@ import timber.log.Timber
 
 class ArCameraView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
-) : FrameLayout(context, attrs, defStyleAttr) {
+) : ConstraintLayout(context, attrs, defStyleAttr) {
     init {
         View.inflate(context, R.layout.ar_camera_layout, this)
     }
@@ -45,6 +43,11 @@ class ArCameraView @JvmOverloads constructor(
 
     private var pikachuNode: Node? = null
 
+    var xCoordinate: Float = 1.5f
+    var yCoordinate: Float = 1.5f
+    var zCoordinate: Float = 1.5f
+    var value2: Float = 180.0f
+
     fun setCameraManager(cameraManager: CameraManager){
         this.cameraManager = cameraManager
     }
@@ -61,6 +64,7 @@ class ArCameraView @JvmOverloads constructor(
                 addNodeToScene(it)
                 startBackgroundThread()
                 connectCamera()
+            setUpButtonListener()
             }
             .exceptionally {
                 val builder = AlertDialog.Builder(activity)
@@ -197,5 +201,62 @@ class ArCameraView @JvmOverloads constructor(
         stopBackgroundThread()
     }
 
+    private fun setUpButtonListener() {
+        seekX.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                pikachuNode?.let {
+                    xCoordinate = getConvertedValue(progress)
+                    it.localScale = Vector3(xCoordinate, yCoordinate, zCoordinate)
+                }
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+        })
+
+        seekY.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                pikachuNode?.let {
+                    yCoordinate = getConvertedValue(progress)
+                    it.localScale = Vector3(xCoordinate, yCoordinate, zCoordinate)
+                }
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+        })
+
+        seekZ.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                pikachuNode?.let {
+                    zCoordinate = getConvertedValue(progress)
+                    it.localScale = Vector3(xCoordinate, yCoordinate, zCoordinate)
+                }
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+        })
+
+        btnLeft.setOnClickListener {
+            value2 = (value2 - 20) % 360
+
+            pikachuNode?.let {
+                it.localRotation = Quaternion.axisAngle(Vector3(0.0f, 1.0f, 0.0f), value2)
+            }
+        }
+
+        btnRight.setOnClickListener {
+            value2 = (value2 + 20) % 360
+
+            pikachuNode?.let {
+                it.localRotation = Quaternion.axisAngle(Vector3(0.0f, 1.0f, 0.0f), value2)
+            }
+        }
+    }
+
+    fun getConvertedValue(interval: Int): Float {
+        return 0.3f * interval
+    }
 
 }
