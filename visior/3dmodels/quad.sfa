@@ -1,0 +1,27 @@
+{
+  materials: [
+    {
+      name: '(null)',
+      parameters: [
+        {
+          cameraTexture: {
+            external_path: 'MISSING_PATH',
+          },
+        },
+      ],
+      source: '3dmodels/quad_material.mat',
+    },
+  ],
+  model: {
+    attributes: [
+      'Position',
+      'TexCoord',
+      'Orientation',
+    ],
+    collision: {},
+    file: '3dmodels/quad.obj',
+    name: 'quad',
+    recenter: 'root',
+  },
+  version: '0.54:2',
+}

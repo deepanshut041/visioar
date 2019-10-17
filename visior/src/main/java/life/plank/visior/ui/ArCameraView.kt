@@ -18,6 +18,7 @@ import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.Scene
 import com.google.ar.sceneform.math.Quaternion
 import com.google.ar.sceneform.math.Vector3
+import com.google.ar.sceneform.rendering.ExternalTexture
 import com.google.ar.sceneform.rendering.ModelRenderable
 import kotlinx.android.synthetic.main.ar_camera_layout.view.*
 import life.plank.visior.R
@@ -37,7 +38,10 @@ class ArCameraView @JvmOverloads constructor(
     private lateinit var backgroundThread: HandlerThread
     private lateinit var backgroundHandler: Handler
     private lateinit var cameraManager: CameraManager
+
+    private var cameraTexture = ExternalTexture()
     private lateinit var scene: Scene
+    private lateinit var modelRenderable: ModelRenderable
 
     private var pikachuNode: Node? = null
 
@@ -48,15 +52,15 @@ class ArCameraView @JvmOverloads constructor(
     fun setSceneForm(activity: Activity){
         this.activity = activity
         scene = sceneView.scene // get current scene
-        renderObject(Uri.parse("pikachu.sfb")) // Render the object
+        renderObject(Uri.parse("quad.sfb")) // Render the object
     }
 
     private fun renderObject(parse: Uri) {
-        ModelRenderable.builder()
-            .setSource(activity, parse)
-            .build()
-            .thenAccept {
+        ModelRenderable.builder().setSource(activity, parse).build().thenAccept {
+                it.material.setExternalTexture("cameraTexture", cameraTexture)
                 addNodeToScene(it)
+                startBackgroundThread()
+                connectCamera()
             }
             .exceptionally {
                 val builder = AlertDialog.Builder(activity)
@@ -102,44 +106,26 @@ class ArCameraView @JvmOverloads constructor(
         }
     }
 
-    private val surfaceListener = object: TextureView.SurfaceTextureListener {
-        override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture?, width: Int, height: Int) {
-        }
-
-        override fun onSurfaceTextureUpdated(surface: SurfaceTexture?) = Unit
-
-        override fun onSurfaceTextureDestroyed(surface: SurfaceTexture?) = true
-
-        override fun onSurfaceTextureAvailable(surface: SurfaceTexture?, width: Int, height: Int) {
-            Timber.d( "textureSurface width: $width height: $height")
-            connectCamera()
-        }
-
-    }
-
-
     private fun previewSession() {
-//        val surfaceTexture = cameraView.surfaceTexture
-//        surfaceTexture.setDefaultBufferSize(MAX_PREVIEW_WIDTH, MAX_PREVIEW_HEIGHT)
-//        val surface = Surface(surfaceTexture)
-//
-//        captureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
-//        captureRequestBuilder.addTarget(surface)
-//
-//        cameraDevice.createCaptureSession(
-//            listOf(surface),
-//            object: CameraCaptureSession.StateCallback(){
-//                override fun onConfigureFailed(session: CameraCaptureSession) {
-//                    Timber.e("creating capture session failed!")
-//                }
-//
-//                override fun onConfigured(session: CameraCaptureSession) {
-//                    captureSession = session
-//                    captureRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE)
-//                    captureSession.setRepeatingRequest(captureRequestBuilder.build(), null, null)
-//                }
-//
-//            }, null)
+        cameraTexture.surfaceTexture.setDefaultBufferSize(MAX_PREVIEW_WIDTH, MAX_PREVIEW_HEIGHT)
+        val surface = cameraTexture.surface
+        captureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
+        captureRequestBuilder.addTarget(surface)
+
+        cameraDevice.createCaptureSession(
+            listOf(surface),
+            object: CameraCaptureSession.StateCallback(){
+                override fun onConfigureFailed(session: CameraCaptureSession) {
+                    Timber.e("creating capture session failed!")
+                }
+
+                override fun onConfigured(session: CameraCaptureSession) {
+                    captureSession = session
+                    captureRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE)
+                    captureSession.setRepeatingRequest(captureRequestBuilder.build(), null, null)
+                }
+
+            }, null)
     }
 
     private fun closeCamera() {
@@ -150,7 +136,7 @@ class ArCameraView @JvmOverloads constructor(
     }
 
     private fun startBackgroundThread() {
-        backgroundThread = HandlerThread("Camara2 Kotlin").also { it.start() }
+        backgroundThread = HandlerThread("Camera2 Kotlin").also { it.start() }
         backgroundHandler = Handler(backgroundThread.looper)
     }
 
@@ -203,17 +189,12 @@ class ArCameraView @JvmOverloads constructor(
 
     fun onStart() {
         sceneView.resume()
-//        startBackgroundThread()
-//        if (cameraView.isAvailable)
-//            connectCamera()
-//        else
-//            cameraView.surfaceTextureListener = surfaceListener
     }
 
     fun onPause() {
         sceneView.pause()
-//        closeCamera()
-//        stopBackgroundThread()
+        closeCamera()
+        stopBackgroundThread()
     }
 
 
