@@ -50,14 +50,14 @@ class ArViewViewModel(
                     handleDestination(
                         lc,
                         LocationData(point.lat, point.lon),
-                        oc.aizmuth,
+                        oc.azimuth,
                         point.label
                     )?.let {
                         selectedPoints.add(it)
                     }
                 }
                 ScreenData(
-                    oc.aizmuth.toInt(),
+                    oc.azimuth.toInt(),
                     oc.pitch.toInt(),
                     oc.roll.toInt(),
                     lc.lat,
