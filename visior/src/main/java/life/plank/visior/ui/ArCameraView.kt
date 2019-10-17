@@ -9,9 +9,8 @@ import android.os.Handler
 import android.os.HandlerThread
 import android.util.AttributeSet
 import android.view.View
-import android.widget.SeekBar
+import android.widget.FrameLayout
 import androidx.appcompat.app.AlertDialog
-import androidx.constraintlayout.widget.ConstraintLayout
 import com.google.ar.sceneform.Node
 import com.google.ar.sceneform.Scene
 import com.google.ar.sceneform.math.Quaternion
@@ -24,7 +23,7 @@ import timber.log.Timber
 
 class ArCameraView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
-) : ConstraintLayout(context, attrs, defStyleAttr) {
+) : FrameLayout(context, attrs, defStyleAttr) {
     init {
         View.inflate(context, R.layout.ar_camera_layout, this)
     }
@@ -39,14 +38,9 @@ class ArCameraView @JvmOverloads constructor(
 
     private var cameraTexture = ExternalTexture()
     private lateinit var scene: Scene
-    private lateinit var modelRenderable: ModelRenderable
 
+    private var cameraNode: Node? = null
     private var pikachuNode: Node? = null
-
-    var xCoordinate: Float = 1.5f
-    var yCoordinate: Float = 1.5f
-    var zCoordinate: Float = 1.5f
-    var value2: Float = 180.0f
 
     fun setCameraManager(cameraManager: CameraManager){
         this.cameraManager = cameraManager
@@ -55,16 +49,16 @@ class ArCameraView @JvmOverloads constructor(
     fun setSceneForm(activity: Activity){
         this.activity = activity
         scene = sceneView.scene // get current scene
-        renderObject(Uri.parse("quad.sfb")) // Render the object
+        renderCamera(Uri.parse("quad.sfb")) // Render the Camera
+        renderObject(Uri.parse("pikachu.sfb")) // Render the pikachu
     }
 
-    private fun renderObject(parse: Uri) {
+    private fun renderCamera(parse: Uri) {
         ModelRenderable.builder().setSource(activity, parse).build().thenAccept {
                 it.material.setExternalTexture("cameraTexture", cameraTexture)
-                addNodeToScene(it)
+                addCameraToScene(it)
                 startBackgroundThread()
                 connectCamera()
-            setUpButtonListener()
             }
             .exceptionally {
                 val builder = AlertDialog.Builder(activity)
@@ -77,6 +71,36 @@ class ArCameraView @JvmOverloads constructor(
 
     }
 
+    private fun renderObject(parse: Uri) {
+        ModelRenderable.builder()
+            .setSource(activity, parse)
+            .build()
+            .thenAccept {
+                addNodeToScene(it)
+            }
+            .exceptionally {
+                val builder = AlertDialog.Builder(activity)
+                builder.setMessage(it.message)
+                    .setTitle("error!")
+                val dialog = builder.create()
+                dialog.show()
+                return@exceptionally null
+            }
+    }
+
+    private fun addCameraToScene(model: ModelRenderable?) {
+
+        model?.let {
+            cameraNode = Node().apply {
+                setParent(scene)
+                localPosition = Vector3(0f, 0f, -1f)
+                name = "Camera"
+                renderable = it
+            }
+            scene.addChild(cameraNode)
+        }
+    }
+    
     private fun addNodeToScene(model: ModelRenderable?) {
 
         model?.let {
@@ -199,64 +223,6 @@ class ArCameraView @JvmOverloads constructor(
         sceneView.pause()
         closeCamera()
         stopBackgroundThread()
-    }
-
-    private fun setUpButtonListener() {
-        seekX.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                pikachuNode?.let {
-                    xCoordinate = getConvertedValue(progress)
-                    it.localScale = Vector3(xCoordinate, yCoordinate, zCoordinate)
-                }
-            }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-        })
-
-        seekY.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                pikachuNode?.let {
-                    yCoordinate = getConvertedValue(progress)
-                    it.localScale = Vector3(xCoordinate, yCoordinate, zCoordinate)
-                }
-            }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-        })
-
-        seekZ.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                pikachuNode?.let {
-                    zCoordinate = getConvertedValue(progress)
-                    it.localScale = Vector3(xCoordinate, yCoordinate, zCoordinate)
-                }
-            }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-        })
-
-        btnLeft.setOnClickListener {
-            value2 = (value2 - 20) % 360
-
-            pikachuNode?.let {
-                it.localRotation = Quaternion.axisAngle(Vector3(0.0f, 1.0f, 0.0f), value2)
-            }
-        }
-
-        btnRight.setOnClickListener {
-            value2 = (value2 + 20) % 360
-
-            pikachuNode?.let {
-                it.localRotation = Quaternion.axisAngle(Vector3(0.0f, 1.0f, 0.0f), value2)
-            }
-        }
-    }
-
-    fun getConvertedValue(interval: Int): Float {
-        return 0.3f * interval
     }
 
 }
