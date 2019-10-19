@@ -16,8 +16,6 @@ import org.koin.core.KoinComponent
 import org.koin.core.inject
 import org.koin.dsl.koinApplication
 import org.koin.dsl.module
-import android.hardware.camera2.CameraDevice
-import android.util.Log
 import android.widget.Toast
 import life.plank.visior.data.view.ArPointData
 import timber.log.Timber
@@ -87,15 +85,7 @@ class ArView @JvmOverloads constructor(
             startCamera()
             viewModel.getLivePoints().observe(it.getLifecycleOwner(), Observer { screenData ->
                 txtAzimuthText.text = screenData.azimuth.toString()
-                txtRollText.text = screenData.roll.toString()
-                txtPitchText.text = screenData.pitch.toString()
-                txtLongitudeText.text = screenData.lon.toString()
-                txtLatitudeText.text = screenData.lat.toString()
-                var s = ""
-                for (point in screenData.points)
-                    s =  point.label + ", "
-
-                txtPointsText.text = s
+                arCameraView.setPokemon(screenData.points)
             })
             isArViewStarted = true
         }

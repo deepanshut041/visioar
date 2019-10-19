@@ -1,9 +1,11 @@
 package life.plank.visior.ui
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.toLiveData
 import com.tbruyelle.rxpermissions2.Permission
+import io.reactivex.Flowable
 import io.reactivex.Observable
 import io.reactivex.rxkotlin.combineLatest
 import life.plank.visior.data.location.LocationData
@@ -13,6 +15,7 @@ import life.plank.visior.data.view.ArPointData
 import life.plank.visior.data.view.ArSelectedPoint
 import life.plank.visior.data.view.ScreenData
 import life.plank.visior.util.PermissionManager
+import java.util.concurrent.TimeUnit
 import kotlin.math.*
 
 class ArViewViewModel(
@@ -44,7 +47,8 @@ class ArViewViewModel(
         return locationRepository
             .getLocationUpdates()
             .combineLatest(rotationRepository.getOrientationUpdate())
-            .map { (lc, oc) ->
+            .sample(1, TimeUnit.SECONDS)
+            .flatMap { (lc, oc) ->
                 val selectedPoints = ArrayList<ArSelectedPoint>()
                 for (point in points) {
                     handleDestination(
@@ -56,14 +60,14 @@ class ArViewViewModel(
                         selectedPoints.add(it)
                     }
                 }
-                ScreenData(
+                Flowable.just(ScreenData(
                     oc.azimuth.toInt(),
                     oc.pitch.toInt(),
                     oc.roll.toInt(),
                     lc.lat,
                     lc.lon,
                     selectedPoints
-                )
+                ))
 
             }.toLiveData()
     }

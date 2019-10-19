@@ -19,6 +19,7 @@ import com.google.ar.sceneform.rendering.ExternalTexture
 import com.google.ar.sceneform.rendering.ModelRenderable
 import kotlinx.android.synthetic.main.ar_camera_layout.view.*
 import life.plank.visior.R
+import life.plank.visior.data.view.ArSelectedPoint
 import timber.log.Timber
 
 class ArCameraView @JvmOverloads constructor(
@@ -38,9 +39,10 @@ class ArCameraView @JvmOverloads constructor(
 
     private var cameraTexture = ExternalTexture()
     private lateinit var scene: Scene
+    private var pokemonModel: ModelRenderable? = null
+    private var nodes = ArrayList<Node>()
 
     private var cameraNode: Node? = null
-    private var pikachuNode: Node? = null
 
     fun setCameraManager(cameraManager: CameraManager){
         this.cameraManager = cameraManager
@@ -76,7 +78,7 @@ class ArCameraView @JvmOverloads constructor(
             .setSource(activity, parse)
             .build()
             .thenAccept {
-                addNodeToScene(it)
+                pokemonModel = it
             }
             .exceptionally {
                 val builder = AlertDialog.Builder(activity)
@@ -97,23 +99,35 @@ class ArCameraView @JvmOverloads constructor(
                 name = "Camera"
                 renderable = it
             }
+
             scene.addChild(cameraNode)
         }
     }
     
-    private fun addNodeToScene(model: ModelRenderable?) {
+    private fun addNodeToScene(arSelectedPoint: ArSelectedPoint): Node {
 
-        model?.let {
-            pikachuNode = Node().apply {
-                setParent(scene)
-                localPosition = Vector3(0f, -1f, -2f)
-                localRotation = Quaternion.axisAngle(Vector3(0.0f, 1.0f, 0.0f), 180f)
-                localScale = Vector3(1.5f, 1.5f, 1.5f)
-                name = "Pikachu"
-                renderable = it
+        val scale = (10 - arSelectedPoint.distance) * .2f
+        return Node().apply {
+            setParent(scene)
+            localPosition = Vector3(0f, -1f, -2f)
+            localRotation = Quaternion.axisAngle(Vector3(0.0f, 1.0f, 0.0f), 180f)
+            localScale = Vector3(scale, scale, scale)
+            name = arSelectedPoint.label
+            renderable = pokemonModel
+        }
+    }
+
+    fun setPokemon(points: List<ArSelectedPoint>){
+        pokemonModel?.let {
+            nodes.forEach {
+                scene.removeChild(it)
             }
-
-            scene.addChild(pikachuNode)
+            nodes.removeAll(nodes)
+            points.forEach {
+                val node = addNodeToScene(it)
+                scene.addChild(node)
+                nodes.add(node)
+            }
         }
     }
 
