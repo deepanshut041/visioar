@@ -52,7 +52,7 @@ class ArCameraView @JvmOverloads constructor(
         this.activity = activity
         scene = sceneView.scene // get current scene
         renderCamera(Uri.parse("quad.sfb")) // Render the Camera
-        renderObject(Uri.parse("pikachu.sfb")) // Render the pikachu
+        renderObject(Uri.parse("pikachu_animated.sfb")) // Render the pikachu
     }
 
     private fun renderCamera(parse: Uri) {
@@ -104,7 +104,11 @@ class ArCameraView @JvmOverloads constructor(
         }
     }
     
-    private fun addNodeToScene(arSelectedPoint: ArSelectedPoint): Node {
+    private fun addNodeToScene(
+        arSelectedPoint: ArSelectedPoint,
+        roll: Int,
+        pitch: Int
+    ): Node {
 
         val scale = (10 - arSelectedPoint.distance) * .2f
         return Node().apply {
@@ -117,18 +121,18 @@ class ArCameraView @JvmOverloads constructor(
         }
     }
 
-    fun setPokemon(points: List<ArSelectedPoint>){
-        pokemonModel?.let {
-            nodes.forEach {
-                scene.removeChild(it)
-            }
-            nodes.removeAll(nodes)
-            points.forEach {
-                val node = addNodeToScene(it)
-                scene.addChild(node)
-                nodes.add(node)
-            }
-        }
+    fun setPokemon(){
+//        pokemonModel?.let {
+//            nodes.forEach {
+//                scene.removeChild(it)
+//            }
+//            nodes.removeAll(nodes)
+//            data.points.forEach {
+//                val node = addNodeToScene(it, data.roll, data.pitch)
+//                scene.addChild(node)
+//                nodes.add(node)
+//            }
+//        }
     }
 
     private val deviceStateCallback = object: CameraDevice.StateCallback() {

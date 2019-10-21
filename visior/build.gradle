@@ -91,3 +91,8 @@ sceneform.asset('3dmodels/quad.obj',
         '3dmodels/quad_material.mat',
         '3dmodels/quad.sfa',
         'src/main/assets/quad')
+
+sceneform.asset('3dmodels/pikachu_animated.fbx',
+        'default',
+        '3dmodels/pikachu_animated.sfa',
+        'src/main/assets/pikachu_animated')
