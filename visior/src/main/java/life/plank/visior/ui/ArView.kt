@@ -96,9 +96,9 @@ class ArView @JvmOverloads constructor(
             mapView.onCreate(null)
             mapView.getMapAsync(MapViewListener())
             mapView.onStart()
-            markerList.clear()
             viewModel.getLivePoints().observe(it.getLifecycleOwner(), Observer { points ->
                 gMap?.clear()
+                markerList.clear()
                 points.forEach { pointInRadius ->
                     markerList[pointInRadius.label] = pointInRadius
                     gMap?.addMarker(getMarker(pointInRadius))
@@ -150,10 +150,19 @@ class ArView @JvmOverloads constructor(
             gMap?.let{
                 it.isMyLocationEnabled = true
                 it.uiSettings.isMyLocationButtonEnabled = true
-                it.animateCamera(CameraUpdateFactory.zoomTo(20.0f))
-                it.setMapStyle(MapStyleOptions.loadRawResourceStyle(
-                    dependencyProvider!!.getPermissionActivity(), R.raw.map_json))
+//                it.setMapStyle(MapStyleOptions.loadRawResourceStyle(
+//                    dependencyProvider!!.getPermissionActivity(), R.raw.map_json))
                 it.setOnMarkerClickListener(MarkerClickListener())
+
+                val cameraPosition = CameraPosition.builder()
+                    .target(LatLng(15.5511178,73.7823974))
+                    .zoom(20.0f)
+                    .tilt(67.5f)
+                    .bearing(314.0f)
+                    .build()
+
+                it.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
+
             }
 
         }
