@@ -1,19 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:id="@+id/arLayout"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <life.plank.visior.ui.ArMapView
         android:id="@+id/arMapView"
-        android:visibility="visible"
+        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
-    <life.plank.visior.ui.ArCameraView
-        android:visibility="gone"
-        android:id="@+id/arCameraView"
+    <fragment
+        android:id="@+id/sceneformFragment"
+        android:name="com.google.ar.sceneform.ux.ArFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
