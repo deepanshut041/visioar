@@ -17,15 +17,8 @@ import org.koin.core.inject
 import org.koin.dsl.koinApplication
 import org.koin.dsl.module
 import android.widget.Toast
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.model.*
 import life.plank.visior.data.view.ArPointData
-import life.plank.visior.data.view.PointsInRadius
 import timber.log.Timber
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 
 
 class ArView @JvmOverloads constructor(
@@ -37,8 +30,6 @@ class ArView @JvmOverloads constructor(
     }
 
 
-    private var gMap:GoogleMap? = null
-    private var markerList = HashMap<String, PointsInRadius>()
     private var dependencyProvider: DependencyProvider? = null
     var isArViewStarted: Boolean = false
 
@@ -93,16 +84,9 @@ class ArView @JvmOverloads constructor(
     @SuppressLint("LogNotTimber")
     private fun setSensorDataListeners() {
         dependencyProvider?.let {
-            mapView.onCreate(null)
-            mapView.getMapAsync(MapViewListener())
-            mapView.onStart()
+            arMapView.onCreate(it)
             viewModel.getLivePoints().observe(it.getLifecycleOwner(), Observer { points ->
-                gMap?.clear()
-                markerList.clear()
-                points.forEach { pointInRadius ->
-                    markerList[pointInRadius.label] = pointInRadius
-                    gMap?.addMarker(getMarker(pointInRadius))
-                }
+                arMapView.setMarker(points)
             })
             isArViewStarted = true
         }
@@ -127,63 +111,6 @@ class ArView @JvmOverloads constructor(
 //        arCameraView.onStart()
     }
 
-    // Map util
-    private fun getMarker(pointInRadius:PointsInRadius): MarkerOptions? {
-        val marker = MarkerOptions().position(pointInRadius.locationData).title(pointInRadius.label)
-        val opt: BitmapFactory.Options = BitmapFactory.Options()
-        opt.inMutable = true
-        if (pointInRadius.distance > 10){
-            val imageBitmap = BitmapFactory.decodeResource(resources, R.drawable.marker, opt)
-            val resized = Bitmap.createScaledBitmap(imageBitmap, 80, 80, true)
-            marker.icon(BitmapDescriptorFactory.fromBitmap(resized))
-        } else{
-            val imageBitmap = BitmapFactory.decodeResource(resources, R.drawable.near, opt)
-            val resized = Bitmap.createScaledBitmap(imageBitmap, 150, 150, true)
-            marker.icon(BitmapDescriptorFactory.fromBitmap(resized))
-        }
-        return marker
-    }
 
-    inner class MapViewListener: OnMapReadyCallback{
-        override fun onMapReady(googleMap: GoogleMap?) {
-            gMap = googleMap
-            gMap?.let{
-                it.isMyLocationEnabled = true
-                it.uiSettings.isMyLocationButtonEnabled = true
-//                it.setMapStyle(MapStyleOptions.loadRawResourceStyle(
-//                    dependencyProvider!!.getPermissionActivity(), R.raw.map_json))
-                it.setOnMarkerClickListener(MarkerClickListener())
-
-                val cameraPosition = CameraPosition.builder()
-                    .target(LatLng(15.5511178,73.7823974))
-                    .zoom(20.0f)
-                    .tilt(67.5f)
-                    .bearing(314.0f)
-                    .build()
-
-                it.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
-
-            }
-
-        }
-    }
-
-    inner class MarkerClickListener: GoogleMap.OnMarkerClickListener{
-        override fun onMarkerClick(marker: Marker?): Boolean {
-            marker?.let {
-                val point = markerList[it.title]
-                point?.let { pnt ->
-                    if (pnt.distance > 10)
-                        Toast.makeText(dependencyProvider!!.getContext(), "${pnt.label} is ${pnt.distance}m away", Toast.LENGTH_SHORT).show()
-                    else
-                        Toast.makeText(dependencyProvider!!.getContext(), "${pnt.label} collected", Toast.LENGTH_SHORT).show()
-                }?: run{
-                    Toast.makeText(dependencyProvider!!.getContext(), it.title, Toast.LENGTH_SHORT).show()
-                }
-            }
-            return true
-        }
-
-    }
 
 }
