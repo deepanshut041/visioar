@@ -102,11 +102,12 @@ class ArView @JvmOverloads constructor(
     }
 
     fun onPause() {
-//        mapView.onPause()
+        arMapView.onPause()
 //        arCameraView.onPause()
     }
 
     fun onResume() {
+        arMapView.onResume()
 //        mapView.onResume()
 //        arCameraView.onStart()
     }

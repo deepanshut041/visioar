@@ -101,4 +101,13 @@ class ArMapView @JvmOverloads constructor(
         }
 
     }
+
+    fun onPause(){
+        mapView.onPause()
+    }
+
+    fun onResume(){
+        mapView.onResume()
+
+    }
 }
