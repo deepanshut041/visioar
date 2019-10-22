@@ -1,0 +1,208 @@
+{
+  animations: [
+    {
+      clips: [
+        {
+          name: 'Armature|Camera Running Action',
+        },
+        {
+          name: 'Armature|Cute',
+        },
+        {
+          name: 'Armature|Cute 2',
+        },
+        {
+          name: 'Armature|CuteAction',
+        },
+        {
+          name: 'Armature|Idle',
+        },
+        {
+          name: 'Armature|Jump',
+        },
+        {
+          name: 'Armature|Run',
+        },
+        {
+          name: 'Armature|Static',
+        },
+        {
+          name: 'Armature|Static-Cute',
+        },
+        {
+          name: 'Armature|Walk',
+        },
+      ],
+      path: '3dmodels/pikachu_animated.fbx',
+    },
+  ],
+  materials: [
+    {
+      name: 'Skin',
+      parameters: [
+        {
+          baseColor: [
+            0.897092,
+            0.64231799999999994,
+            0.0027980000000000001,
+            1,
+          ],
+        },
+        {
+          baseColorMap: null,
+        },
+        {
+          normalMap: null,
+        },
+        {
+          interpolatedColor: null,
+        },
+        {
+          metallic: 0,
+        },
+        {
+          metallicMap: null,
+        },
+        {
+          roughness: 1,
+        },
+        {
+          roughnessMap: null,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/fbx_material.sfm',
+    },
+    {
+      name: 'Eye, Ear',
+      parameters: [
+        {
+          baseColor: [
+            0,
+            0,
+            0,
+            1,
+          ],
+        },
+        {
+          baseColorMap: null,
+        },
+        {
+          normalMap: null,
+        },
+        {
+          interpolatedColor: null,
+        },
+        {
+          metallic: 0,
+        },
+        {
+          metallicMap: null,
+        },
+        {
+          roughness: 1,
+        },
+        {
+          roughnessMap: null,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/fbx_material.sfm',
+    },
+    {
+      name: 'Eye 02',
+      parameters: [
+        {
+          baseColor: [
+            0.80000000000000004,
+            0.80000000000000004,
+            0.80000000000000004,
+            1,
+          ],
+        },
+        {
+          baseColorMap: null,
+        },
+        {
+          normalMap: null,
+        },
+        {
+          interpolatedColor: null,
+        },
+        {
+          metallic: 0,
+        },
+        {
+          metallicMap: null,
+        },
+        {
+          roughness: 1,
+        },
+        {
+          roughnessMap: null,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/fbx_material.sfm',
+    },
+    {
+      name: 'Cheek',
+      parameters: [
+        {
+          baseColor: [
+            0.287441,
+            0.00060700000000000001,
+            0.010330000000000001,
+            1,
+          ],
+        },
+        {
+          baseColorMap: null,
+        },
+        {
+          normalMap: null,
+        },
+        {
+          interpolatedColor: null,
+        },
+        {
+          metallic: 0,
+        },
+        {
+          metallicMap: null,
+        },
+        {
+          roughness: 1,
+        },
+        {
+          roughnessMap: null,
+        },
+        {
+          opacity: null,
+        },
+      ],
+      source: 'build/sceneform_sdk/default_materials/fbx_material.sfm',
+    },
+  ],
+  model: {
+    attributes: [
+      'Position',
+      'TexCoord',
+      'Orientation',
+      'BoneIndices',
+      'BoneWeights',
+    ],
+    collision: {},
+    file: '3dmodels/pikachu_animated.fbx',
+    name: 'pikachu_animated',
+    recenter: 'root',
+    scale: 0.29445900000000003,
+  },
+  version: '0.54:2',
+}
