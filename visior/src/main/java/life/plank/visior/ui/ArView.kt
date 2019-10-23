@@ -59,6 +59,14 @@ class ArView @JvmOverloads constructor(
             )
         )
         checkPermission()
+
+        backButton.setOnClickListener {
+            // arCoreView.onDestroy()
+            arCameraView.onPause()
+            arCameraView.onDestroy()
+            arCameraView.visibility = View.GONE
+            it.visibility = View.GONE
+        }
     }
 
     private fun checkPermission() {
@@ -98,6 +106,7 @@ class ArView @JvmOverloads constructor(
     }
 
     private fun renderArView(pointsInRadius: PointsInRadius) {
+        backButton.visibility = View.VISIBLE
         if (isArCoreSupported){
             arCoreView.visibility = View.VISIBLE
             arCoreView.onCreate(dependencyProvider!!)

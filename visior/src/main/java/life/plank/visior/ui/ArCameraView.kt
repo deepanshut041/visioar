@@ -199,35 +199,29 @@ class ArCameraView @JvmOverloads constructor(
         }
     }
 
-    private fun <T> CameraCharacteristics.Key<T>.cameraCharacteristics(
-        cameraId: String
-    ): T {
+    private fun <T> cameraCharacteristics(cameraId: String, key: CameraCharacteristics.Key<T>) :T {
         val characteristics = cameraManager.getCameraCharacteristics(cameraId)
-        return when (this) {
-            CameraCharacteristics.LENS_FACING -> characteristics.get(this)!!
-            CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP -> characteristics.get(this)!!
+        return when (key) {
+            CameraCharacteristics.LENS_FACING -> characteristics.get(key)!!
+            CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP -> characteristics.get(key)!!
             else -> throw  IllegalArgumentException("Key not recognized")
         }
     }
 
-    private fun Int.cameraId(): String {
+    private fun cameraId(lens: Int) : String {
         var deviceId = listOf<String>()
         try {
             val cameraIdList = cameraManager.cameraIdList
-            deviceId = cameraIdList.filter {
-                this == CameraCharacteristics.LENS_FACING.cameraCharacteristics(
-                    it
-                )
-            }
+            deviceId = cameraIdList.filter { lens == cameraCharacteristics(it, CameraCharacteristics.LENS_FACING) }
         } catch (e: CameraAccessException) {
-            Timber.e(e.toString())
+            Timber.e( e.toString())
         }
         return deviceId[0]
     }
 
     @SuppressLint("MissingPermission")
     private fun connectCamera() {
-        val deviceId = CameraCharacteristics.LENS_FACING_BACK.cameraId()
+        val deviceId = cameraId(CameraCharacteristics.LENS_FACING_BACK)
         Timber.d("deviceId: $deviceId")
         try {
             cameraManager.openCamera(deviceId, deviceStateCallback, backgroundHandler)
