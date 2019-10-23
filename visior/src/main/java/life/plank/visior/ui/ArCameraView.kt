@@ -19,7 +19,7 @@ import com.google.ar.sceneform.rendering.ExternalTexture
 import com.google.ar.sceneform.rendering.ModelRenderable
 import kotlinx.android.synthetic.main.ar_camera_layout.view.*
 import life.plank.visior.R
-import life.plank.visior.data.view.ArSelectedPoint
+import life.plank.visior.data.view.PointsInRadius
 import timber.log.Timber
 
 class ArCameraView @JvmOverloads constructor(
@@ -29,39 +29,47 @@ class ArCameraView @JvmOverloads constructor(
         View.inflate(context, R.layout.ar_camera_layout, this)
     }
 
+    // Sceneform
+    private lateinit var scene: Scene
+    private var cameraTexture = ExternalTexture()
+    private var objectModel: ModelRenderable? = null
+    private var cameraNode: Node? = null
+
+    // Context
     private lateinit var activity: Activity
+
+    // Camera
+    private lateinit var cameraManager: CameraManager
     private lateinit var cameraDevice: CameraDevice
     private lateinit var captureSession: CameraCaptureSession
     private lateinit var captureRequestBuilder: CaptureRequest.Builder
     private lateinit var backgroundThread: HandlerThread
     private lateinit var backgroundHandler: Handler
-    private lateinit var cameraManager: CameraManager
 
-    private var cameraTexture = ExternalTexture()
-    private lateinit var scene: Scene
-    private var pokemonModel: ModelRenderable? = null
-    private var nodes = ArrayList<Node>()
+    //Object details
+    private lateinit var pointsInRadius: PointsInRadius
 
-    private var cameraNode: Node? = null
+    // Hondling lifecycle
+    private var isSceneStarted = false
+    private var isCameraStarted = false
 
-    fun setCameraManager(cameraManager: CameraManager){
+    fun setCameraManager(cameraManager: CameraManager) {
         this.cameraManager = cameraManager
     }
 
-    fun setSceneForm(activity: Activity){
+    fun setSceneForm(activity: Activity) {
         this.activity = activity
         scene = sceneView.scene // get current scene
-        renderCamera(Uri.parse("quad.sfb")) // Render the Camera
-        renderObject(Uri.parse("pikachu_animated.sfb")) // Render the pikachu
     }
 
     private fun renderCamera(parse: Uri) {
         ModelRenderable.builder().setSource(activity, parse).build().thenAccept {
-                it.material.setExternalTexture("cameraTexture", cameraTexture)
-                addCameraToScene(it)
-                startBackgroundThread()
-                connectCamera()
-            }
+            it.material.setExternalTexture("cameraTexture", cameraTexture)
+            addCameraToScene(it)
+            startBackgroundThread()
+            connectCamera()
+            isSceneStarted = true
+        }
             .exceptionally {
                 val builder = AlertDialog.Builder(activity)
                 builder.setMessage(it.message)
@@ -71,23 +79,6 @@ class ArCameraView @JvmOverloads constructor(
                 return@exceptionally null
             }
 
-    }
-
-    private fun renderObject(parse: Uri) {
-        ModelRenderable.builder()
-            .setSource(activity, parse)
-            .build()
-            .thenAccept {
-                pokemonModel = it
-            }
-            .exceptionally {
-                val builder = AlertDialog.Builder(activity)
-                builder.setMessage(it.message)
-                    .setTitle("error!")
-                val dialog = builder.create()
-                dialog.show()
-                return@exceptionally null
-            }
     }
 
     private fun addCameraToScene(model: ModelRenderable?) {
@@ -103,39 +94,48 @@ class ArCameraView @JvmOverloads constructor(
             scene.addChild(cameraNode)
         }
     }
-    
-    private fun addNodeToScene(
-        arSelectedPoint: ArSelectedPoint,
-        roll: Int,
-        pitch: Int
-    ): Node {
 
-        val scale = (10 - arSelectedPoint.distance) * .2f
+    fun setPokemon(pointsInRadius: PointsInRadius) {
+        this.pointsInRadius = pointsInRadius
+        renderObject(Uri.parse("pikachu.sfb")) // Render the pikachu
+    }
+
+    private fun renderObject(parse: Uri) {
+        ModelRenderable.builder()
+            .setSource(activity, parse)
+            .build()
+            .thenAccept {
+                objectModel = it
+                objectModel?.let {
+                    val node = addNodeToScene(pointsInRadius)
+                    scene.addChild(node)
+                }
+            }
+            .exceptionally {
+                val builder = AlertDialog.Builder(activity)
+                builder.setMessage(it.message)
+                    .setTitle("error!")
+                val dialog = builder.create()
+                dialog.show()
+                return@exceptionally null
+            }
+    }
+
+    private fun addNodeToScene(
+        pointsInRadius: PointsInRadius
+    ): Node {
+//        val scale = (10 - pointsInRadius.distance) * .2f
         return Node().apply {
             setParent(scene)
             localPosition = Vector3(0f, -1f, -2f)
             localRotation = Quaternion.axisAngle(Vector3(0.0f, 1.0f, 0.0f), 180f)
-            localScale = Vector3(scale, scale, scale)
-            name = arSelectedPoint.label
-            renderable = pokemonModel
+            localScale = Vector3(1.5f, 1.5f, 1.5f)
+            name = pointsInRadius.label
+            renderable = objectModel
         }
     }
 
-    fun setPokemon(){
-//        pokemonModel?.let {
-//            nodes.forEach {
-//                scene.removeChild(it)
-//            }
-//            nodes.removeAll(nodes)
-//            data.points.forEach {
-//                val node = addNodeToScene(it, data.roll, data.pitch)
-//                scene.addChild(node)
-//                nodes.add(node)
-//            }
-//        }
-    }
-
-    private val deviceStateCallback = object: CameraDevice.StateCallback() {
+    private val deviceStateCallback = object : CameraDevice.StateCallback() {
         override fun onOpened(camera: CameraDevice) {
             Timber.d("camera device opened")
             cameraDevice = camera
@@ -143,12 +143,12 @@ class ArCameraView @JvmOverloads constructor(
         }
 
         override fun onDisconnected(camera: CameraDevice) {
-            Timber.d( "camera device disconnected")
+            Timber.d("camera device disconnected")
             camera.close()
         }
 
         override fun onError(camera: CameraDevice, error: Int) {
-            Timber.d( "camera device error")
+            Timber.d("camera device error")
         }
     }
 
@@ -160,18 +160,22 @@ class ArCameraView @JvmOverloads constructor(
 
         cameraDevice.createCaptureSession(
             listOf(surface),
-            object: CameraCaptureSession.StateCallback(){
+            object : CameraCaptureSession.StateCallback() {
                 override fun onConfigureFailed(session: CameraCaptureSession) {
                     Timber.e("creating capture session failed!")
                 }
 
                 override fun onConfigured(session: CameraCaptureSession) {
                     captureSession = session
-                    captureRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE)
+                    captureRequestBuilder.set(
+                        CaptureRequest.CONTROL_AF_MODE,
+                        CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE
+                    )
                     captureSession.setRepeatingRequest(captureRequestBuilder.build(), null, null)
                 }
 
-            }, null)
+            }, null
+        )
     }
 
     private fun closeCamera() {
@@ -191,40 +195,46 @@ class ArCameraView @JvmOverloads constructor(
         try {
             backgroundThread.join()
         } catch (e: InterruptedException) {
-            Timber.e( e.toString())
+            Timber.e(e.toString())
         }
     }
 
-    private fun <T> cameraCharacteristics(cameraId: String, key: CameraCharacteristics.Key<T>) :T {
+    private fun <T> CameraCharacteristics.Key<T>.cameraCharacteristics(
+        cameraId: String
+    ): T {
         val characteristics = cameraManager.getCameraCharacteristics(cameraId)
-        return when (key) {
-            CameraCharacteristics.LENS_FACING -> characteristics.get(key)!!
-            CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP -> characteristics.get(key)!!
+        return when (this) {
+            CameraCharacteristics.LENS_FACING -> characteristics.get(this)!!
+            CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP -> characteristics.get(this)!!
             else -> throw  IllegalArgumentException("Key not recognized")
         }
     }
 
-    private fun cameraId(lens: Int) : String {
+    private fun Int.cameraId(): String {
         var deviceId = listOf<String>()
         try {
             val cameraIdList = cameraManager.cameraIdList
-            deviceId = cameraIdList.filter { lens == cameraCharacteristics(it, CameraCharacteristics.LENS_FACING) }
+            deviceId = cameraIdList.filter {
+                this == CameraCharacteristics.LENS_FACING.cameraCharacteristics(
+                    it
+                )
+            }
         } catch (e: CameraAccessException) {
-            Timber.e( e.toString())
+            Timber.e(e.toString())
         }
         return deviceId[0]
     }
 
     @SuppressLint("MissingPermission")
     private fun connectCamera() {
-        val deviceId = cameraId(CameraCharacteristics.LENS_FACING_BACK)
-        Timber.d( "deviceId: $deviceId")
+        val deviceId = CameraCharacteristics.LENS_FACING_BACK.cameraId()
+        Timber.d("deviceId: $deviceId")
         try {
             cameraManager.openCamera(deviceId, deviceStateCallback, backgroundHandler)
         } catch (e: CameraAccessException) {
-            Timber.e( e.toString())
+            Timber.e(e.toString())
         } catch (e: InterruptedException) {
-            Timber.e( "Open camera device interrupted while opened")
+            Timber.e("Open camera device interrupted while opened")
         }
     }
 
@@ -234,13 +244,38 @@ class ArCameraView @JvmOverloads constructor(
     }
 
     fun onStart() {
-        sceneView.resume()
+        renderCamera(Uri.parse("quad.sfb")) // Render the Camera
+    }
+
+    fun onResume() {
+        if (isSceneStarted)
+            sceneView.resume()
+        if (isCameraStarted) {
+            startBackgroundThread()
+            connectCamera()
+        }
     }
 
     fun onPause() {
-        sceneView.pause()
-        closeCamera()
-        stopBackgroundThread()
+        if (isSceneStarted)
+            sceneView.pause()
+        if (isCameraStarted) {
+            closeCamera()
+            stopBackgroundThread()
+        }
+    }
+
+    fun onDestroy() {
+
+        if (isSceneStarted){
+            sceneView.destroy()
+            isSceneStarted = false
+        }
+        if (isCameraStarted){
+            closeCamera()
+            stopBackgroundThread()
+            isCameraStarted = false
+        }
     }
 
 }

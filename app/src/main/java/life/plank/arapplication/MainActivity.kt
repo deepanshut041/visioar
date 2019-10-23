@@ -57,4 +57,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        if (arView.isArViewStarted){
+            arView.onDestroy()
+        }
+    }
+
 }

@@ -7,6 +7,7 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.lifecycle.LiveData
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -15,6 +16,7 @@ import kotlinx.android.synthetic.main.ar_map_layout.view.*
 import life.plank.visior.R
 import life.plank.visior.data.view.PointsInRadius
 import life.plank.visior.di.DependencyProvider
+import life.plank.visior.util.SingleLiveEvent
 
 class ArMapView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
@@ -26,6 +28,10 @@ class ArMapView @JvmOverloads constructor(
     private var gMap:GoogleMap? = null
     private var markerList = HashMap<String, PointsInRadius>()
     private var dependencyProvider: DependencyProvider? = null
+    val pointSelected: LiveData<PointsInRadius>
+        get() = _pointSelected
+
+    private val _pointSelected = SingleLiveEvent<PointsInRadius>()
 
     fun onCreate(dependencyProvider: DependencyProvider){
         this.dependencyProvider = dependencyProvider
@@ -92,7 +98,9 @@ class ArMapView @JvmOverloads constructor(
                     if (pnt.distance > 10)
                         Toast.makeText(dependencyProvider!!.getContext(), "${pnt.label} is ${pnt.distance}m away", Toast.LENGTH_SHORT).show()
                     else
-                        Toast.makeText(dependencyProvider!!.getContext(), "${pnt.label} collected", Toast.LENGTH_SHORT).show()
+                    {
+                        _pointSelected.value = pnt
+                    }
                 }?: run{
                     Toast.makeText(dependencyProvider!!.getContext(), it.title, Toast.LENGTH_SHORT).show()
                 }
@@ -108,6 +116,9 @@ class ArMapView @JvmOverloads constructor(
 
     fun onResume(){
         mapView.onResume()
+    }
 
+    fun onDestroy(){
+        mapView.onDestroy()
     }
 }
